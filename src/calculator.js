@@ -20,8 +20,6 @@
 
 'use strict';
 
-const args = process.argv.slice(2);
-
 function usage(exitCode = 1) {
   console.log('Usage: calculator.js <operation> <num1> <num2>');
   console.log('Operations: add(+), subtract(-), multiply(*), divide(/)');
@@ -31,62 +29,67 @@ function usage(exitCode = 1) {
   process.exit(exitCode);
 }
 
-if (args.length !== 3) {
-  usage(1);
+// Only run CLI logic when executed directly, not when required as a module
+if (require.main === module) {
+  const args = process.argv.slice(2);
+
+  if (args.length !== 3) {
+    usage(1);
+  }
+
+  const [opRaw, aRaw, bRaw] = args;
+  const op = String(opRaw).toLowerCase();
+  const a = Number(aRaw);
+  const b = Number(bRaw);
+
+  if (Number.isNaN(a) || Number.isNaN(b)) {
+    console.error('Error: both operands must be valid numbers');
+    usage(2);
+  }
+
+  let result;
+  switch (op) {
+    // Addition
+    case 'add':
+    case '+':
+    case 'plus':
+      result = a + b;
+      break;
+
+    // Subtraction
+    case 'subtract':
+    case '-':
+    case 'minus':
+      result = a - b;
+      break;
+
+    // Multiplication
+    case 'multiply':
+    case '*':
+    case 'x':
+    case '×':
+      result = a * b;
+      break;
+
+    // Division
+    case 'divide':
+    case '/':
+    case '÷':
+      if (b === 0) {
+        console.error('Error: division by zero');
+        process.exit(3);
+      }
+      result = a / b;
+      break;
+
+    default:
+      console.error(`Unknown operation: ${opRaw}`);
+      usage(4);
+  }
+
+  // Print the numeric result to stdout
+  console.log(result);
 }
-
-const [opRaw, aRaw, bRaw] = args;
-const op = String(opRaw).toLowerCase();
-const a = Number(aRaw);
-const b = Number(bRaw);
-
-if (Number.isNaN(a) || Number.isNaN(b)) {
-  console.error('Error: both operands must be valid numbers');
-  usage(2);
-}
-
-let result;
-switch (op) {
-  // Addition
-  case 'add':
-  case '+':
-  case 'plus':
-    result = a + b;
-    break;
-
-  // Subtraction
-  case 'subtract':
-  case '-':
-  case 'minus':
-    result = a - b;
-    break;
-
-  // Multiplication
-  case 'multiply':
-  case '*':
-  case 'x':
-  case '×':
-    result = a * b;
-    break;
-
-  // Division
-  case 'divide':
-  case '/':
-  case '÷':
-    if (b === 0) {
-      console.error('Error: division by zero');
-      process.exit(3);
-    }
-    result = a / b;
-    break;
-
-  default:
-    console.error(`Unknown operation: ${opRaw}`);
-    usage(4);
-}
-
-// Print the numeric result to stdout
-console.log(result);
 
 // Export functions for programmatic use (optional)
 module.exports = {
